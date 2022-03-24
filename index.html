@@ -44,16 +44,20 @@
       },
     };
 
-    console.log("야옹");
+    const fetchCat = async (text) => {
+      const OPEN_API_DOMAIN = "https://cataas.com";
+      const response = await fetch(`${OPEN_API_DOMAIN}/cat/says/${text}?json=true`);
+      const responseJson = await response.json();
+      return `${OPEN_API_DOMAIN}/${responseJson.url}`;
+    };
 
     function CatItem(props) {
-
       return (
         <li>
           <img src={props.img} style={{ width: '150px' }} />
         </li>
       )
-    }
+    };
 
 
     const Title = (props) => {
@@ -87,7 +91,7 @@
           setErrorMessage('빈값으로 생성할 수 없습니다');
           return;
         }
-        updateMainCat();
+        updateMainCat(value);
       }
 
       return (
@@ -136,8 +140,22 @@
         jsonLocalStorage.getItem("favorites") || []  // jsonLocalStorage가 null값이면 빈배열로 초기값을 해줘라
       );
 
-      function updateMainCat() {
-        setMainCat(CAT2);
+      async function setInitalCat() {
+        const newCat = await fetchCat('First cat');
+        console.log(newCat);
+        setMainCat(newCat);
+      }
+
+      React.useEffect(() => {
+        setInitalCat();
+      }, []);
+
+
+      async function updateMainCat(value) {
+
+        const newCat = await fetchCat(value);
+
+        setMainCat(newCat);
         const nextCounter = counter + 1;
         setCounter(nextCounter);
         jsonLocalStorage.setItem("counter", nextCounter);
@@ -148,7 +166,6 @@
         const nextFavorites = [...favorites, mainCat];
         setFavorites(nextFavorites);
         jsonLocalStorage.setItem("favorites", nextFavorites);
-
       }
 
       return (
